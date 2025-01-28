@@ -43,6 +43,6 @@ jobs:
           sonar-scanner \
             -Dsonar.organization=guiss0 \
             -Dsonar.projectKey=guiss0_java-reachability-playground \
-            -Dsonar.sources=. \
+            -Dsonar.sources=src/main/java \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
