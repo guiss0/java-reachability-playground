@@ -1,48 +1,25 @@
-name: SonarQube Analysis
-
 on:
+  # Trigger analysis when pushing to your main branches, and when creating a pull request.
   push:
     branches:
-      - master # Ejecuta el análisis solo en la rama main
+      - main
+      - master
+      - develop
+      - 'releases/**'
   pull_request:
-    branches:
-      - master # Ejecuta el análisis para Pull Requests dirigidos a main
+      types: [opened, synchronize, reopened]
 
+name: Main Workflow
 jobs:
-  sonarQubeAnalysis:
-    name: SonarQube Analysis Job
-    runs-on: ubuntu-latest # Ejecutar en un runner Ubuntu
-
+  sonarqube:
+    runs-on: ubuntu-latest
     steps:
-      # 1. Checkout del repositorio
-      - name: Check out repository
-        uses: actions/checkout@v2
-
-      # 2. Configurar Java (SonarQube necesita Java para ejecutarse)
-      - name: Set up Java
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-
-      # 3. Configurar el token de SonarQube (se usa solo en el siguiente paso)
-      - name: Configure SonarQube token
-        run: echo "Configuring SonarQube token"
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      # 4. Descargar y ejecutar Sonar Scanner
-      - name: Run SonarQube Scanner
-        run: |
-          # Descargar Sonar Scanner
-          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-          unzip sonar-scanner-cli-4.8.0.2856-linux.zip -d $HOME
-          export PATH="$HOME/sonar-scanner-4.8.0.2856-linux/bin:$PATH"
-
-          # Ejecutar análisis con Sonar Scanner
-          sonar-scanner \
-            -Dsonar.organization=guiss0 \
-            -Dsonar.projectKey=guiss0_java-reachability-playground \
-            -Dsonar.sources=src/main/java \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+    - uses: actions/checkout@v4
+      with:
+        # Disabling shallow clones is recommended for improving the relevancy of reporting
+        fetch-depth: 0
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@<action version> # Ex: v4.1.0, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
