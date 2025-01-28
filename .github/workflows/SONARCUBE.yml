@@ -3,10 +3,10 @@ name: SonarQube Analysis
 on:
   push:
     branches:
-      - main # Ejecuta el análisis solo en la rama main
+      - master # Ejecuta el análisis solo en la rama main
   pull_request:
     branches:
-      - main # Ejecuta el análisis para Pull Requests dirigidos a main
+      - master # Ejecuta el análisis para Pull Requests dirigidos a main
 
 jobs:
   sonarQubeAnalysis:
