@@ -3,15 +3,15 @@ name: SonarQube Analysis
 on:
   push:
     branches:
-      - main # Ejecuta el análisis solo cuando haya cambios en la rama main
+      - main # Ejecuta el análisis solo en la rama main
   pull_request:
     branches:
-      - main # Ejecuta el análisis en los Pull Requests hacia main
+      - main # Ejecuta el análisis para Pull Requests dirigidos a main
 
 jobs:
   sonarQubeAnalysis:
     name: SonarQube Analysis Job
-    runs-on: ubuntu-latest # Ejecutar el pipeline en un runner Ubuntu
+    runs-on: ubuntu-latest # Ejecutar en un runner Ubuntu
 
     steps:
       # 1. Checkout del repositorio
@@ -22,23 +22,24 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
-          distribution: 'temurin' # Java OpenJDK
-          java-version: '11' # SonarQube requiere Java 11 o superior
+          distribution: 'temurin'
+          java-version: '11'
 
-      # 3. Configurar el token de SonarQube
+      # 3. Configurar el token de SonarQube (se usa solo en el siguiente paso)
       - name: Configure SonarQube token
+        run: echo "Configuring SonarQube token"
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Configura tu token como un secreto en el repositorio
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # 4. Ejecutar SonarQube Scanner
+      # 4. Descargar y ejecutar Sonar Scanner
       - name: Run SonarQube Scanner
         run: |
-          # Descargar y configurar el Sonar Scanner
+          # Descargar Sonar Scanner
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
           unzip sonar-scanner-cli-4.8.0.2856-linux.zip -d $HOME
           export PATH="$HOME/sonar-scanner-4.8.0.2856-linux/bin:$PATH"
 
-          # Ejecutar el análisis
+          # Ejecutar análisis con Sonar Scanner
           sonar-scanner \
             -Dsonar.projectKey=guiss0_java-reachability-playground \
-            -Dsonar.login=$SONAR_TOKEN
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
